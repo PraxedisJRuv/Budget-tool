@@ -22,19 +22,18 @@ def execute_sql_file(name_file,cursor):
                 cursor.execute(query)
 
 def record_buy(values_buy,values_product, cursor, connection):
-    query="INSERT INTO compras (Fecha, Monto, Comercio, Tipo, Cantidad_productos) VALUES (%s, %s, %s, %s,%s)"
+    from utils.SQL.queries.load_queries import load_dict_query
+    queries=load_dict_query("utils/SQL/queries/record_buy.sql")
     #values=[(date,amount,store,type,cantidad)]
-    query_with_values(query, values_buy, cursor, connection)
+    query_with_values(queries["Add_buy"], values_buy, cursor, connection)
     
     IDcompra=cursor.lastrowid
-    query="INSERT INTO gastos (Fecha, Monto, Concepto) VALUES (%s, %s, %s)"
     values_aux=[(values_buy[0][0],values_buy[0][1],"compra")]
-    query_with_values(query,values_aux,cursor,connection)
+    query_with_values(queries["Add_expense"],values_aux,cursor,connection)
     IDgasto=cursor.lastrowid
     
-    query="UPDATE compras SET ID_gasto = %s WHERE ID_compra = %s"
     values_aux=[(IDgasto,IDcompra)]
-    query_with_values(query,values_aux,cursor,connection)
+    query_with_values(queries["Update_IDexpense_in_buy"],values_aux,cursor,connection)
 
     #for i in range(cantidad): 
     #en general definir la función captura para productos
@@ -42,14 +41,11 @@ def record_buy(values_buy,values_product, cursor, connection):
         aux_tuple=(*values_product[i],IDcompra,IDgasto)
         values_product[i]=aux_tuple
 
-    query="INSERT INTO producto (Producto, Costo, Cantidad, ID_compra, ID_gasto) VALUES (%s, %s, %s, %s,%s)"
     #values_product=[(Producto, Costo, Cantidad, IDcompra, IDgasto)]
-    query_with_values(query,values_product, cursor, connection)
+    query_with_values(queries["Update_productos_from_buy"],values_product, cursor, connection)
 
     for i in range(len(values_product)):
-        query = "INSERT INTO productos (Producto) SELECT %s WHERE NOT EXISTS (SELECT 1 FROM productos WHERE Producto = %s)"
         values=[(values_product[i][0],values_product[i][0])]
-        query_with_values(query,values,cursor,connection)
+        query_with_values(queries["Update_product_record"],values,cursor,connection)
     
-    query="UPDATE producto p JOIN productos ps ON p.Producto=ps.Producto SET p.ID_producto=ps.ID_producto"
-    query_commit(query, cursor,connection)
+    query_commit(queries["Update-product_IDs"], cursor,connection)

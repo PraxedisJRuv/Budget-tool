@@ -1,9 +1,14 @@
-from utils.query import query_commit
+import utils.query as qq
 from utils.conection import mysql_connector_connection
 import mysql.connector
 
 config=mysql_connector_connection()
 mycursor=config.cursor()
-sql = "UPDATE prueba SET estado = 'deteriorado' WHERE estado = 'en deterioro'"
+sql = "INSERT INTO prueba (edad,conteo,gender,estado) VALUES(%s,%s,%s,%s)"
+values=[(31,127.0,"femeino","vulnerable")]
 
-query_commit(sql,mycursor,config)
+
+qq.query_with_values(sql,values,mycursor,config)
+
+mycursor.close()
+config.close()

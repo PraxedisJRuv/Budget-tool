@@ -4,7 +4,8 @@ Fecha DATE,
 Monto DECIMAL(10,2),
 Comercio VARCHAR(30),
 Tipo VARCHAR(40),
-IDgasto INT
+Cantidad_productos INT,
+ID_gasto INT
 );
 
 CREATE TABLE IF NOT EXISTS producto (
@@ -13,8 +14,8 @@ Producto VARCHAR(40),
 ID_producto INT,
 Costo DECIMAL(10,2),
 Cantidad DECIMAL(10,2),
-IDcompra INT,
-IDgasto INT
+ID_compra INT,
+ID_gasto INT
 );
 
 CREATE TABLE IF NOT EXISTS productos(
@@ -31,7 +32,7 @@ Concepto VARCHAR(40)
 
 CREATE TABLE IF NOT EXISTS gastos (
 ID_gasto INT AUTO_INCREMENT PRIMARY KEY,
-Monto DECIMAL(10,2),
 Fecha DATE,
+Monto DECIMAL(10,2),
 Concepto VARCHAR(40)
 );

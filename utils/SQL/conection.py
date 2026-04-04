@@ -6,7 +6,6 @@ def sql_alchemy_connection():
     
     return connection
 
-
 def mysql_connector_connection():
     import mysql.connector
     
@@ -22,3 +21,7 @@ def mysql_conncector_cursor():
     config=mysql_connector_connection()
     cursor=config.cursor()
     return cursor
+
+def close_con_cur(cursor, connection):
+    cursor.close()
+    connection.close()

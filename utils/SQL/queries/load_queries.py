@@ -3,7 +3,6 @@ def load_dict_query(path):
     queries = {}
     with open(path, "r") as f:
         content = f.read()
-    print(content)
     sections = content.split("-- ")
 
     for section in sections[1:]:

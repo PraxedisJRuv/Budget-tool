@@ -24,7 +24,6 @@ def execute_sql_file(name_file,cursor):
 def record_buy(values_buy,values_product, cursor, connection):
     from utils.SQL.queries.load_queries import load_dict_query
     queries=load_dict_query("utils/SQL/queries/record_buy.sql")
-    #values=[(date,amount,store,type,cantidad)]
     query_with_values(queries["Add_buy"], values_buy, cursor, connection)
     
     IDcompra=cursor.lastrowid
@@ -35,13 +34,10 @@ def record_buy(values_buy,values_product, cursor, connection):
     values_aux=[(IDgasto,IDcompra)]
     query_with_values(queries["Update_IDexpense_in_buy"],values_aux,cursor,connection)
 
-    #for i in range(cantidad): 
-    #en general definir la función captura para productos
     for i in range(len(values_product)):
         aux_tuple=(*values_product[i],IDcompra,IDgasto)
         values_product[i]=aux_tuple
 
-    #values_product=[(Producto, Costo, Cantidad, IDcompra, IDgasto)]
     query_with_values(queries["Update_productos_from_buy"],values_product, cursor, connection)
 
     for i in range(len(values_product)):
@@ -51,7 +47,7 @@ def record_buy(values_buy,values_product, cursor, connection):
     query_commit(queries["Update-product_IDs"], cursor,connection)
 
 
-def record_income(op,values,cursor,connection):
+def record_inex(op,values,cursor,connection):
     from utils.SQL.queries.load_queries import load_dict_query
     query=load_dict_query("utils/SQL/queries/record_inex.sql")
     if op=="income":

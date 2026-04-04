@@ -76,7 +76,6 @@ elif st.session_state.pagina == "registro":
 
     # Contenido dinámico
     if st.session_state.subpagina == "tipo1":
-        import streamlit as st
 
         # Estado inicial
         if "fase" not in st.session_state:
@@ -189,10 +188,31 @@ elif st.session_state.pagina == "registro":
                     st.session_state.borrador = None
 
     elif st.session_state.subpagina == "tipo2":
+
         st.subheader("Registro Tipo 2")
-        st.text_input("Producto")
-        st.number_input("Cantidad")
-        st.button("Guardar")
+
+        with st.form("form_tipo2"):
+
+            opcion = st.radio(
+                "Selecciona una opción",
+                ["income", "expense"],
+                horizontal=True
+            )
+
+            fecha = st.date_input("Fecha")
+            valor = st.number_input("Valor (float)", format="%.2f")
+            texto = st.text_input("Texto")
+
+            guardar = st.form_submit_button("Guardar")
+
+            if guardar:
+                value = [(fecha, valor, texto)]
+                connection=mysql_connector_connection()
+                mycursor=connection.cursor()
+                qq.record_inex(opcion,value,mycursor,connection)
+                close_con_cur(mycursor,connection)
+                st.success("Guardado")
+                st.write(value)
 
     elif st.session_state.subpagina == "tipo3":
         st.subheader("Registro Tipo 3")

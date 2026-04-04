@@ -19,7 +19,7 @@ def cambiar_subpagina(sub):
 
 # Main Menu
 if st.session_state.pagina == "menu":
-    st.title("Menú principal")
+    st.title("Main menu")
 
     col1, col2, col3 = st.columns(3)
 
@@ -61,11 +61,11 @@ elif st.session_state.pagina == "registro":
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("Tipo 1"):
+        if st.button("Compras"):
             cambiar_subpagina("tipo1")
 
     with col2:
-        if st.button("Tipo 2"):
+        if st.button("Ingresos y gastos"):
             cambiar_subpagina("tipo2")
 
     with col3:
@@ -95,10 +95,10 @@ elif st.session_state.pagina == "registro":
 
             with st.form("form_principal"):
                 fecha = st.date_input("Fecha")
-                valor = st.number_input("Valor")
-                texto1 = st.text_input("Texto 1")
-                texto2 = st.text_input("Texto 2")
-                n = st.number_input("Cantidad de sub-registros", min_value=0, step=1)
+                valor = st.number_input("Monto total")
+                texto1 = st.text_input("Comercio")
+                texto2 = st.text_input("Concepto")
+                n = st.number_input("Cantidad de productos", min_value=0, step=1)
 
                 continuar = st.form_submit_button("Continuar")
 
@@ -108,10 +108,10 @@ elif st.session_state.pagina == "registro":
                     st.session_state.fase = "subregistros"
 
 
-        # SUBREGISTROS
+        # productos-subregistros
         elif st.session_state.fase == "subregistros":
 
-            st.write("Sub-registros")
+            st.write("Productos")
 
             sub_datos = []
 
@@ -120,9 +120,9 @@ elif st.session_state.pagina == "registro":
                 for i in range(st.session_state.n_registros):
                     st.markdown(f"### Registro {i+1}")
 
-                    s = st.text_input(f"Texto {i}", key=f"s_{i}")
-                    f1 = st.number_input(f"Float 1 {i}", key=f"f1_{i}")
-                    f2 = st.number_input(f"Float 2 {i}", key=f"f2_{i}")
+                    s = st.text_input(f"Producto {i}", key=f"s_{i}")
+                    f1 = st.number_input(f"Costo {i}", key=f"f1_{i}")
+                    f2 = st.number_input(f"Cantidad {i}", key=f"f2_{i}")
 
                     sub_datos.append((s, f1, f2))
 
@@ -147,22 +147,22 @@ elif st.session_state.pagina == "registro":
             st.markdown("### Datos principales")
 
             fecha = st.date_input("Fecha", value=datos_principales[0])
-            valor = st.number_input("Valor", value=datos_principales[1])
-            texto1 = st.text_input("Texto 1", value=datos_principales[2])
-            texto2 = st.text_input("Texto 2", value=datos_principales[3])
+            valor = st.number_input("Costo", value=datos_principales[1])
+            texto1 = st.text_input("Comercio", value=datos_principales[2])
+            texto2 = st.text_input("Concepto", value=datos_principales[3])
             n = datos_principales[4]
 
             nuevos_sub = []
 
-            st.markdown("### Sub-registros")
+            st.markdown("### Productos")
 
             for i, (s_old, f1_old, f2_old) in enumerate(sub_datos):
 
-                st.markdown(f"#### Registro {i+1}")
+                st.markdown(f"#### Productos {i+1}")
 
-                s = st.text_input(f"Texto {i}", value=s_old, key=f"edit_s_{i}")
-                f1 = st.number_input(f"Float 1 {i}", value=f1_old, key=f"edit_f1_{i}")
-                f2 = st.number_input(f"Float 2 {i}", value=f2_old, key=f"edit_f2_{i}")
+                s = st.text_input(f"Producto {i}", value=s_old, key=f"edit_s_{i}")
+                f1 = st.number_input(f"Coste {i}", value=f1_old, key=f"edit_f1_{i}")
+                f2 = st.number_input(f"Cantidad {i}", value=f2_old, key=f"edit_f2_{i}")
 
                 nuevos_sub.append((s, f1, f2))
 
@@ -189,21 +189,21 @@ elif st.session_state.pagina == "registro":
 
     elif st.session_state.subpagina == "tipo2":
 
-        st.subheader("Registro Tipo 2")
+        st.subheader("Registro gastos e ingresos")
 
         with st.form("form_tipo2"):
 
             opcion = st.radio(
-                "Selecciona una opción",
+                "Type of record",
                 ["income", "expense"],
                 horizontal=True
             )
 
             fecha = st.date_input("Fecha")
-            valor = st.number_input("Valor (float)", format="%.2f")
-            texto = st.text_input("Texto")
+            valor = st.number_input("Monto", format="%.2f")
+            texto = st.text_input("Concepto")
 
-            guardar = st.form_submit_button("Guardar")
+            guardar = st.form_submit_button("Save")
 
             if guardar:
                 value = [(fecha, valor, texto)]
@@ -211,8 +211,7 @@ elif st.session_state.pagina == "registro":
                 mycursor=connection.cursor()
                 qq.record_inex(opcion,value,mycursor,connection)
                 close_con_cur(mycursor,connection)
-                st.success("Guardado")
-                st.write(value)
+                st.success("Saved")
 
     elif st.session_state.subpagina == "tipo3":
         st.subheader("Registro Tipo 3")

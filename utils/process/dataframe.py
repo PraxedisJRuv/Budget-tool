@@ -13,3 +13,9 @@ def get_dataframe(query):
     connection.dispose()
     return df
 
+def get_datafame_wparam(query,param):
+    import pandas as pd
+    connection=sql_alchemy_connection()
+    df = pd.read_sql(query, connection,params=param)
+    connection.dispose()
+    return df

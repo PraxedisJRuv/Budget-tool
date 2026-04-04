@@ -13,6 +13,16 @@ def query_commit(query, cursor, connection):
     cursor.execute(query)
     connection.commit()
 
+def get_query_nv_value(query, cursor):
+    cursor.execute(query)
+    var=cursor.fetchone()
+    return var
+
+def get_query_value(values,query, cursor):
+    cursor.execute(query, values)
+    var=cursor.fetchone()
+    return var[0]
+
 def execute_sql_file(name_file,cursor):
     #name_file="script.sql"
     with open(name_file,"r") as f:

@@ -2,6 +2,8 @@ import streamlit as st
 import utils.SQL.query as qq
 from utils.SQL.conection import mysql_connector_connection, close_con_cur
 import mysql.connector
+import plotly.express as px
+import utils.process1 as p1
 
 # Set State
 if "pagina" not in st.session_state:
@@ -38,8 +40,7 @@ if st.session_state.pagina == "menu":
 
 # Dashbaord tool
 elif st.session_state.pagina == "ver_a":
-    st.title("Visualización A")
-    st.write("Aquí muestras datos tipo A")
+    p1.dashboard()
 
     st.button("Volver", on_click=cambiar_pagina, args=("menu",))
 

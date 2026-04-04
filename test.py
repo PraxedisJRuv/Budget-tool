@@ -13,8 +13,8 @@ values_buy=[(my_date,235.22,"HEB","mandado",3)]
 #values_product=[(Producto, Costo, Cantidad, IDcompra, IDgasto)]
 values_product=[
     ("Manzana",35.22,1.22),
-    ("Pene",100, 1),
-    ("Putas",100,4)
+    ("Aguacate",100, 1),
+    ("Leche",100,4)
 ]
 
 qq.record_buy(values_buy,values_product,mycursor,config)

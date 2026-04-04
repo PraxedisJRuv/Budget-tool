@@ -49,3 +49,12 @@ def record_buy(values_buy,values_product, cursor, connection):
         query_with_values(queries["Update_product_record"],values,cursor,connection)
     
     query_commit(queries["Update-product_IDs"], cursor,connection)
+
+
+def record_income(op,values,cursor,connection):
+    from utils.SQL.queries.load_queries import load_dict_query
+    query=load_dict_query("utils/SQL/queries/record_inex.sql")
+    if op=="income":
+        query_with_values(query["Record_Income"], values, cursor, connection)
+    if op=="expense":
+        query_with_values(query["Record_Expense"], values, cursor, connection)

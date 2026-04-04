@@ -1,0 +1,5 @@
+Currently I'm working with both sqlalchemy and mysql connector the second 
+since I wan't to learn propperly SQL and it's vital to write everything with
+SQL syntax. The first is beacuse is more robust and there might be certain 
+actions that requiere that, like making a dataframe out of a table to further
+process.

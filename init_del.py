@@ -25,7 +25,7 @@ def delete():
 #init()
 #delete()
 
-from utils.SQL.queries.load_queries import load_dict_query
-queries=load_dict_query("C:/Users/praxy/OneDrive/Escritorio/Progra/Budget_app/utils/SQL/queries/record_buy.sql")
-print(queries)
-print(queries["Add_buy"])
+from utils.process.dataframe import get_dataframe
+query="SELECT * FROM producto"
+df=get_dataframe(query)
+print(df)

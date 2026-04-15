@@ -15,7 +15,7 @@ def dashboard():
     # Selectors
     col1, col2 = st.columns(2)
     start = col1.date_input("Start", date(2025,1,1))
-    end = col2.date_input("End", date(2026,1,1))
+    end = col2.date_input("End", date.today())
 
     values=(start,end)
 

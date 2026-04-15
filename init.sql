@@ -36,3 +36,12 @@ Fecha DATE,
 Monto DECIMAL(10,2),
 Concepto VARCHAR(40)
 );
+
+CREATE TABLE IF NOT EXISTS deuda(
+    ID_deuda INT AUTO_INCREMENT PRIMARY KEY,
+    Fecha DATE,
+    Monto DECIMAL (10,2),
+    Prestamista VARCHAR(20),
+    Prestatario VARCHAR(20),
+    Interés DECIMAL (4,2)
+);

@@ -22,10 +22,6 @@ def delete():
     mycursor.close()
     config.close()
 
-#init()
+init()
 #delete()
 
-from utils.process.dataframe import get_dataframe
-query="SELECT * FROM producto"
-df=get_dataframe(query)
-print(df)

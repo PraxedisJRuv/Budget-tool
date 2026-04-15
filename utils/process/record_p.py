@@ -79,9 +79,9 @@ def record():
                 for i in range(st.session_state.n_registros):
                     st.markdown(f"### Registro {i+1}")
 
-                    s = st.text_input(f"Producto {i}", key=f"s_{i}")
-                    f1 = st.number_input(f"Costo {i}", key=f"f1_{i}")
-                    f2 = st.number_input(f"Cantidad {i}", key=f"f2_{i}")
+                    s = st.text_input(f"Producto {i+1}", key=f"s_{i+1}")
+                    f1 = st.number_input(f"Costo {i+1}", key=f"f1_{i+1}")
+                    f2 = st.number_input(f"Cantidad {i+1}", key=f"f2_{i+1}")
 
                     sub_datos.append((s, f1, f2))
 
@@ -119,9 +119,9 @@ def record():
 
                 st.markdown(f"#### Productos {i+1}")
 
-                s = st.text_input(f"Producto {i}", value=s_old, key=f"edit_s_{i}")
-                f1 = st.number_input(f"Coste {i}", value=f1_old, key=f"edit_f1_{i}")
-                f2 = st.number_input(f"Cantidad {i}", value=f2_old, key=f"edit_f2_{i}")
+                s = st.text_input(f"Producto {i+1}", value=s_old, key=f"edit_s_{i+1}")
+                f1 = st.number_input(f"Coste {i+1}", value=f1_old, key=f"edit_f1_{i+1}")
+                f2 = st.number_input(f"Cantidad {i+1}", value=f2_old, key=f"edit_f2_{i+1}")
 
                 nuevos_sub.append((s, f1, f2))
 
@@ -140,7 +140,6 @@ def record():
                     close_con_cur(mycursor,connection)
 
                     st.success("Guardado")
-                    st.write(values_buy,nuevos_sub)
 
                     # Reset opcional
                     st.session_state.fase = "entrada"

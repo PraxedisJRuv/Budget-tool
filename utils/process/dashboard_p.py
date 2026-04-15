@@ -23,8 +23,8 @@ def dashboard():
         query=load_dict_query(r"utils/SQL/queries/filter_by_date.sql")
 
 
-        df_exp=daf.get_datafame_wparam(query["Amount_type_expense_bd"],values)
-        df_income=daf.get_datafame_wparam(query["Amount_type_income_bd"],values)
+        df_exp=daf.get_datafame_wparam(query["Frequency_and_Amount_by_type_expense_bd"],values)
+        df_income=daf.get_datafame_wparam(query["Frequency_and_Amount_by_type_income_bd"],values)
 
         connection=mysql_connector_connection()
         mycursor=connection.cursor()
@@ -64,7 +64,7 @@ def dashboard():
                 fig_gastos = px.pie(
                     df_exp,
                     names="Concepto",
-                    values="frequency",
+                    values="total",
                     title="Distribución de gastos",
                     hole=0.4  # donut opcional
                 )
@@ -78,7 +78,7 @@ def dashboard():
                 fig_ingresos = px.pie(
                     df_income,
                     names="Concepto",
-                    values="frequency",
+                    values="total",
                     title="Distribución de ingresos",
                     hole=0.4
                 )

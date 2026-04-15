@@ -43,5 +43,5 @@ CREATE TABLE IF NOT EXISTS deuda(
     Monto DECIMAL (10,2),
     Prestamista VARCHAR(20),
     Prestatario VARCHAR(20),
-    Interés DECIMAL (4,2)
+    Tasa DECIMAL (4,2)
 );

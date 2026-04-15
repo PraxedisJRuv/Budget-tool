@@ -19,3 +19,9 @@ SELECT Concepto, count(*) as frequency FROM gastos WHERE Fecha  BETWEEN %s AND %
 
 -- Amount_type_income_bd
 SELECT Concepto, count(*) as frequency FROM ingresos WHERE Fecha  BETWEEN %s AND %s GROUP BY Concepto;
+
+-- Frequency_and_Amount_by_type_income_bd
+SELECT Concepto, count(*) as frequency, SUM(Monto) as total FROM ingresos WHERE Fecha  BETWEEN %s AND %s GROUP BY Concepto;
+
+-- Frequency_and_Amount_by_type_expense_bd
+SELECT Concepto, count(*) as frequency, SUM(Monto) as total FROM gastos WHERE Fecha  BETWEEN %s AND %s GROUP BY Concepto;

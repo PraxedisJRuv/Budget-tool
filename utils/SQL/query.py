@@ -66,7 +66,7 @@ def record_inex(op,values,cursor,connection):
         query_with_values(query["Record_Expense"], values, cursor, connection)
 
 def record_debt(op, value, cursor, connection):
-    query="INSERT INTO deuda (Fecha, Monto, Prestamista, Prestatario, Interés) VALUES (%s, %s, %s, %s, %s);"
+    query="INSERT INTO deuda (Fecha, Monto, Prestamista, Prestatario, Tasa) VALUES (%s, %s, %s, %s, %s);"
     if op=="Lender":
         values = [(value[0], value[1], ".", value[2], value[3])]
         record_inex("expense",[(value[0],value[1],"préstamo")],cursor, connection)

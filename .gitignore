@@ -206,7 +206,9 @@ llm
 igonre/
 ignore
 
+__pycache__
 __pycache__/
 */__pycache__/*
 /__pycache__
 */__pycache__
+**/__pycache__/

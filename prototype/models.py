@@ -45,10 +45,25 @@ class Products_Update(SQLModel):
 """
 Product
 """
-
-class Product_Table(SQLModel, table=True):
+class Product_Base(SQLModel):
+    name: str
+class Product_Table(Product_Base, table=True):
     __tablename__="product"
     id: Optional[int]= Field(default=None, primary_key=True)
+
+class Product_Record(SQLModel):
+    pass
+
+class Product_Public(Product_Base):
+    id: int
+    
+class Product_List(BaseModel):
+    items: List[Product_Public]
+    total: int
+    offset: int
+    limit: int
+    
+class Product_Update(SQLModel):
     name:str
 
 """
@@ -89,37 +104,92 @@ class Buy_Update(SQLModel):
 """
 Expense
 """
-class Expense_Table(SQLModel, table=True):
-    __tablename__="expense"
-    id: Optional[int]=Field(default=None, primary_key=True)
+class Expense_Base(SQLModel):
     date: str=Field(default_factory=lambda: datetime.now().isoformat())
     amount: float
     concept: str 
     description: Optional[str]=Field(default=None)
+class Expense_Table(Expense_Base, table=True):
+    __tablename__="expense"
+    id: Optional[int]=Field(default=None, primary_key=True)
 
+class Expense_Record(Expense_Base):
+    pass
+
+class Expense_Public(Expense_Base):
+    id: int
+
+class Expense_List(BaseModel):
+    items: List[Expense_Public]
+    total: int
+    offset: int
+    limit: int
+
+class Expense_Update(SQLModel):
+    id: int | None=None
+    date: str | None=None
+    amount: float | None=None
+    concept: str | None=None
+    description: str | None=None
+    
 """
 Income
 """
 
-class Income_Table(SQLModel, table=True):
-    __tablename__="income"
-    id: Optional[int]=Field(default=None, primary_key=True)
+class Income_Base(SQLModel):
     date: str=Field(default_factory=lambda: datetime.now().isoformat())
     amount: float
     concept: str
     description: Optional[str]=Field(default=None)
+class Income_Table(SQLModel, table=True):
+    __tablename__="income"
+    id: Optional[int]=Field(default=None, primary_key=True)
     
+class Income_Record(Income_Base):
+    pass
+
+class Income_Public(Income_Base):
+    id: int
+        
+class Income_List(BaseModel):
+    items: List[Income_Base]
+    total: int
+    offset: int
+    limit: int
+    
+class Income_Update(SQLModel):
+    id: int | None=None
+    date: str | None=None
+    amount: float | None=None
+    concept: str | None=None
+    description: str | None=None
 """
 Debt
 """
-class Debt_Table(SQLModel, table=True):
-    id: Optional[int]=Field(default=None, primary_key=True)
+class Debt_Base(SQLModel):
     date: str=Field(default_factory=lambda: datetime.now().isoformat())
     amount: float
     borrower: str
     borrowed: str
     interest: Optional[float]=Field(default=None)
+class Debt_Table(Debt_Base, table=True):
+    id: Optional[int]=Field(default=None, primary_key=True)
+
+class Debt_Record(Debt_Base):
+    pass
+
+class Debt_Public(Debt_Base):
+    id: int
+
+class Debt_List(BaseModel):
+    income: List[Debt_Public]
+    total: int
+    offset: int
+    limit: int
     
-    """
-    
-    """
+class Debt_Update(SQLModel):
+    date: str | None=None
+    amount: float | None=None
+    borrower: str | None=None
+    borrowed: str | None=None
+    interest: float | None=None

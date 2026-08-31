@@ -7,9 +7,9 @@ create_db()
 
 
 """
-
+buy
 """
-@app.post("/buy")
+@app.post("/buy", response_model=Buy_Public)
 def record_buy(buy: Buy_Record, session=Depends(get_session)):
     db_buy=Buys_Table.model_validate(buy)
     session.add(db_buy)

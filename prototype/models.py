@@ -7,33 +7,33 @@ from pydantic import BaseModel
 """
 Products
 """
-class Products_Base(SQLModel):
+class Items_Base(SQLModel):
     name: str
     cost: float
     Quantity: Optional[int]=Field(default=None)
-class Products_Table(Products_Base, table =True):
+class Items_Table(Items_Base, table =True):
     __tablename__="products"
     id: int=Field(primary_key=True)
     ID_product: int=Field(foreign_key="product.id")
     ID_buy: int=Field(foreign_key="buys.id")
     ID_expense: int=Field(foreign_key="expense.id")
     
-class Products_Record(Products_Base):
+class Items_Record(Items_Base):
     pass
 
-class Products_Public(Products_Base):
+class Items_Public(Items_Base):
     id: int
     ID_product: int
     ID_buy: int
     ID_expense: int
     
-class Products_List(BaseModel):
-    items: List[Products_Public]
+class Items_List(BaseModel):
+    items: List[Items_Public]
     total: int
     offset: int
     limit: int
     
-class Products_Update(SQLModel):
+class Items_Update(SQLModel):
     name: str | None = None
     cost: float | None = None
     Quantity: int | None = None
@@ -51,7 +51,7 @@ class Product_Table(Product_Base, table=True):
     __tablename__="product"
     id: Optional[int]= Field(default=None, primary_key=True)
 
-class Product_Record(SQLModel):
+class Product_Record(Product_Base):
     pass
 
 class Product_Public(Product_Base):
@@ -141,7 +141,8 @@ class Income_Base(SQLModel):
     amount: float
     concept: str
     description: Optional[str]=Field(default=None)
-class Income_Table(SQLModel, table=True):
+
+class Income_Table(Income_Base, table=True):
     __tablename__="income"
     id: Optional[int]=Field(default=None, primary_key=True)
     

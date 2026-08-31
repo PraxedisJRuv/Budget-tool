@@ -257,22 +257,50 @@ def delete_income(income_id:int, session=Depends(get_session)):
     return Response(status_code=204)
 
 """
-expenses
+Debt
 """
-
-@app.post("/expenses", response_model=Expenses_Public)
-def record_expenses(expenses: Expenses_Record, session=Depends(get_session)):
-    db_expenses=Expenses_Table.model_validate(expenses)
-    session.add(db_expenses)
+@app.post("/debt", response_model=Debt_Public)
+def record_debt(debt: Debt_Record, session=Depends(get_session)):
+    db_debt=Debt_Table.model_validate(debt)
+    session.add(db_debt)
     session.commit()
-    session.refresh(db_expenses)
-    return db_expenses
+    session.refresh(db_debt)
+    return db_debt
 
-@app.get("/expenses", response_model=Expenses_List)
-def get_expenses(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
-    query = session.query(Expenses_Table)
+@app.get("/debt", response_model=Debt_List)
+def get_debts(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
+    query = session.query(Debt_Table)
     if search:
-        query = query.filter(Expenses_Table.name.contains(search))
-    expenses = query.offset(offset).limit(limit).all()
+        query = query.filter(Debt_Table.name.contains(search))
+    debts = query.offset(offset).limit(limit).all()
     total = query.count()
-    return Expenses_List(items=expenses, total=total, offset=offset, limit=limit)
+    return Debt_List(items=debts, total=total, offset=offset, limit=limit)
+
+@app.get("/debt/{debt_id}", response_model=Debt_Public)
+def get_debt(debt_id:int, session=Depends(get_session)):
+    debt=session.get(Debt_Table, debt_id)
+    if not debt:
+        raise HTTPException(status_code=404, detail="Debt not found")
+    return debt
+
+@app.put("/debt/{debt_id}", response_model=Debt_Public)
+def update_debt(debt_id:int, debt: Debt_Update, session=Depends(get_session)):  
+    db_debt=session.get(Debt_Table, debt_id)
+    if not db_debt:
+        raise HTTPException(status_code=404, detail="Debt not found")
+    debt_data=debt.model_dump(exclude_unset=True)
+    for key, value in debt_data.items():
+        setattr(db_debt, key, value)
+    session.add(db_debt)
+    session.commit()
+    session.refresh(db_debt)
+    return db_debt
+
+@app.delete("/debt/{debt_id}", response_model=Debt_Public)
+def delete_debt(debt_id:int, session=Depends(get_session)): 
+    db_debt=session.get(Debt_Table, debt_id)
+    if not db_debt:
+        raise HTTPException(status_code=404, detail="Debt not found")
+    session.delete(db_debt)
+    session.commit()
+    return Response(status_code=204)

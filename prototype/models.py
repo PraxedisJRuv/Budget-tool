@@ -153,7 +153,7 @@ class Income_Public(Income_Base):
     id: int
         
 class Income_List(BaseModel):
-    items: List[Income_Base]
+    items: List[Income_Public]
     total: int
     offset: int
     limit: int
@@ -174,6 +174,7 @@ class Debt_Base(SQLModel):
     borrowed: str
     interest: Optional[float]=Field(default=None)
 class Debt_Table(Debt_Base, table=True):
+    __tablename__="debt"
     id: Optional[int]=Field(default=None, primary_key=True)
 
 class Debt_Record(Debt_Base):
@@ -183,7 +184,7 @@ class Debt_Public(Debt_Base):
     id: int
 
 class Debt_List(BaseModel):
-    income: List[Debt_Public]
+    items: List[Debt_Public]
     total: int
     offset: int
     limit: int
@@ -194,3 +195,30 @@ class Debt_Update(SQLModel):
     borrower: str | None=None
     borrowed: str | None=None
     interest: float | None=None
+
+"""
+Composite Models for Atomic Transactions
+"""
+class ItemInBuy(SQLModel):
+    """Item/product with quantity being purchased in a buy"""
+    product_name: str
+    cost: float
+    Quantity: int
+
+class BuyWithItemsRecord(SQLModel):
+    """Complete buy transaction: buy + items + expense (ATOMIC)"""
+    # Buy data
+    date: str = Field(default_factory=lambda: datetime.now().isoformat())
+    local: Optional[str] = Field(default=None, max_length=25)
+    business_type: Optional[str] = None
+    # Items being bought
+    items: List[ItemInBuy]
+    # Expense details
+    expense_concept: str
+    expense_description: Optional[str] = None
+
+class BuyWithItemsResponse(SQLModel):
+    """Response showing all created entities from atomic buy"""
+    buy: Buy_Public
+    expense: Expense_Public
+    items: List[Items_Public]

@@ -10,11 +10,91 @@ create_db()
 buy
 """
 
+@app.post("/buy/complete", response_model=BuyWithItemsResponse)
+def record_buy_with_items(buy_data: BuyWithItemsRecord, session=Depends(get_session)):
+    """
+    Atomic transaction: Create buy + expense + items in a single operation.
+    
+    This ensures data integrity by:
+    1. Creating the Expense record
+    2. Creating the Buy record linked to the Expense
+    3. Creating all Items/Products in the buy
+    
+    If any step fails, the entire transaction is rolled back.
+    """
+    try:
+        # Step 1: Create expense (total cost from all items)
+        total_cost = sum(item.cost * item.Quantity for item in buy_data.items)
+        expense = Expense_Table(
+            date=buy_data.date,
+            amount=total_cost,
+            concept=buy_data.expense_concept,
+            description=buy_data.expense_description
+        )
+        session.add(expense)
+        session.flush()  # Get ID without committing
+        
+        # Step 2: Create buy linked to expense
+        buy = Buys_Table(
+            date=buy_data.date,
+            cost=total_cost,
+            local=buy_data.local,
+            business_type=buy_data.business_type,
+            amount_products_type=len(buy_data.items),
+            ID_expense=expense.id
+        )
+        session.add(buy)
+        session.flush()  # Get buy ID
+        
+        # Step 3: Create items in buy
+        created_items = []
+        for item_data in buy_data.items:
+            # Get or create product type
+            product = session.query(Product_Table).filter_by(
+                name=item_data.product_name
+            ).first()
+            if not product:
+                product = Product_Table(name=item_data.product_name)
+                session.add(product)
+                session.flush()
+            
+            # Link item to buy
+            item_in_buy = Items_Table(
+                name=item_data.product_name,
+                cost=item_data.cost,
+                Quantity=item_data.Quantity,
+                ID_product=product.id,
+                ID_buy=buy.id,
+                ID_expense=expense.id
+            )
+            session.add(item_in_buy)
+            created_items.append(item_in_buy)
+        
+        session.commit()
+        session.refresh(buy)
+        session.refresh(expense)
+        
+        return BuyWithItemsResponse(
+            buy=buy,
+            expense=expense,
+            items=created_items
+        )
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=f"Transaction failed: {str(e)}")
+
 @app.post("/buy", response_model=Buy_Public)
 def record_buy(buy: Buy_Record, session=Depends(get_session)):
+    """
+    ⚠️ DEPRECATED for typical use. Use POST /buy/complete instead.
+    
+    This endpoint requires ID_expense to be already created and provided.
+    Only use this for advanced workflows where you're managing transactions manually.
+    
+    For normal usage, use POST /buy/complete which handles the entire transaction atomically.
+    """
     db_buy=Buys_Table.model_validate(buy)
     session.add(db_buy)
-    #We should add the expense when adding a buy
     session.commit()
     session.refresh(db_buy)
     return db_buy
@@ -23,7 +103,7 @@ def record_buy(buy: Buy_Record, session=Depends(get_session)):
 def get_buys(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
     query = session.query(Buys_Table)
     if search:
-        query = query.filter(Buys_Table.name.contains(search))
+        query = query.filter(Buys_Table.local.contains(search))
     buys = query.offset(offset).limit(limit).all()
     total = query.count()
     return Buy_List(items=buys, total=total, offset=offset, limit=limit)
@@ -73,7 +153,7 @@ def record_expense(expense: Expense_Record, session=Depends(get_session)):
 def get_expenses(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
     query = session.query(Expense_Table)
     if search:
-        query = query.filter(Expense_Table.name.contains(search))
+        query = query.filter(Expense_Table.concept.contains(search))
     expenses = query.offset(offset).limit(limit).all()
     total = query.count()
     return Expense_List(items=expenses, total=total, offset=offset, limit=limit)
@@ -158,52 +238,52 @@ def delete_product(product_id:int, session=Depends(get_session)):
     return Response(status_code=204)
 
 """
-products
+Items
 """
 
-@app.post("/products", response_model=Products_Public)
-def record_products(products: Products_Record, session=Depends(get_session)):
-    db_products=Products_Table.model_validate(products)
-    session.add(db_products)
+@app.post("/Items", response_model=Items_Public)
+def record_Items(Items: Items_Record, session=Depends(get_session)):
+    db_Items=Items_Table.model_validate(Items)
+    session.add(db_Items)
     session.commit()
-    session.refresh(db_products)
-    return db_products
+    session.refresh(db_Items)
+    return db_Items
 
-@app.get("/products", response_model=Products_List)
-def get_products(offset:int=0, limit:int=100, search: str = Query(None  ), session=Depends(get_session)):
-    query = session.query(Products_Table)
+@app.get("/Items", response_model=Items_List)
+def get_Items(offset:int=0, limit:int=100, search: str = Query(None  ), session=Depends(get_session)):
+    query = session.query(Items_Table)
     if search:
-        query = query.filter(Products_Table.name.contains(search))
-    products = query.offset(offset).limit(limit).all()
+        query = query.filter(Items_Table.name.contains(search))
+    Items = query.offset(offset).limit(limit).all()
     total = query.count()
-    return Products_List(items=products, total=total, offset=offset, limit=limit)
+    return Items_List(items=Items, total=total, offset=offset, limit=limit)
 
-@app.get("/products/{products_id}", response_model=Products_Public)
-def get_products(products_id:int, session=Depends(get_session)):        
-    products=session.get(Products_Table, products_id)
-    if not products:
-        raise HTTPException(status_code=404, detail="Products not found")
-    return products
+@app.get("/Items/{Items_id}", response_model=Items_Public)
+def get_Item(Items_id:int, session=Depends(get_session)):        
+    Items=session.get(Items_Table, Items_id)
+    if not Items:
+        raise HTTPException(status_code=404, detail="Items not found")
+    return Items
 
-@app.put("/products/{products_id}", response_model=Products_Public)
-def update_products(products_id:int, products: Products_Update, session=Depends(get_session)):  
-    db_products=session.get(Products_Table, products_id)
-    if not db_products:
-        raise HTTPException(status_code=404, detail="Products not found")
-    products_data=products.model_dump(exclude_unset=True)
-    for key, value in products_data.items():
-        setattr(db_products, key, value)
-    session.add(db_products)
+@app.put("/Items/{Items_id}", response_model=Items_Public)
+def update_Items(Items_id:int, Items: Items_Update, session=Depends(get_session)):  
+    db_Items=session.get(Items_Table, Items_id)
+    if not db_Items:
+        raise HTTPException(status_code=404, detail="Items not found")
+    Items_data=Items.model_dump(exclude_unset=True)
+    for key, value in Items_data.items():
+        setattr(db_Items, key, value)
+    session.add(db_Items)
     session.commit()
-    session.refresh(db_products)
-    return db_products
+    session.refresh(db_Items)
+    return db_Items
 
-@app.delete("/products/{products_id}", response_model=Products_Public)
-def delete_products(products_id:int, session=Depends(get_session)):
-    db_products=session.get(Products_Table, products_id)
-    if not db_products:
-        raise HTTPException(status_code=404, detail="Products not found")
-    session.delete(db_products)
+@app.delete("/Items/{Items_id}", response_model=Items_Public)
+def delete_Items(Items_id:int, session=Depends(get_session)):
+    db_Items=session.get(Items_Table, Items_id)
+    if not db_Items:
+        raise HTTPException(status_code=404, detail="Items not found")
+    session.delete(db_Items)
     session.commit()
     return Response(status_code=204)
 
@@ -222,7 +302,7 @@ def record_income(income: Income_Record, session=Depends(get_session)):
 def get_incomes(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
     query = session.query(Income_Table)
     if search:
-        query = query.filter(Income_Table.name.contains(search))
+        query = query.filter(Income_Table.concept.contains(search))
     incomes = query.offset(offset).limit(limit).all()
     total = query.count()
     return Income_List(items=incomes, total=total, offset=offset, limit=limit)
@@ -271,7 +351,7 @@ def record_debt(debt: Debt_Record, session=Depends(get_session)):
 def get_debts(offset:int=0, limit:int=100, search: str = Query(None), session=Depends(get_session)):
     query = session.query(Debt_Table)
     if search:
-        query = query.filter(Debt_Table.name.contains(search))
+        query = query.filter(Debt_Table.borrower.contains(search))
     debts = query.offset(offset).limit(limit).all()
     total = query.count()
     return Debt_List(items=debts, total=total, offset=offset, limit=limit)

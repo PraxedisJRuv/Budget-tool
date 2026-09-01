@@ -2,7 +2,39 @@ from datetime import datetime
 from typing import Optional, Literal, List
 from sqlmodel import Field, SQLModel
 from sqlalchemy import Column, JSON
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+
+def normalize_date_value(value):
+    """Return a consistent YYYY-MM-DD string even when the incoming value contains time data."""
+    if value is None:
+        return datetime.now().date().isoformat()
+
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+
+    if isinstance(value, str):
+        raw = value.strip()
+        if not raw:
+            return datetime.now().date().isoformat()
+
+        iso_candidate = raw.replace("Z", "+00:00")
+        if "T" in iso_candidate or " " in iso_candidate:
+            try:
+                return datetime.fromisoformat(iso_candidate).date().isoformat()
+            except ValueError:
+                raw = raw.split(" ")[0].split("T")[0]
+
+        for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d-%m-%Y", "%d/%m/%Y", "%m/%d/%Y"):
+            try:
+                return datetime.strptime(raw[:10] if len(raw) >= 10 else raw, fmt).date().isoformat()
+            except ValueError:
+                continue
+
+        return raw[:10]
+
+    return str(value)
+
 
 """
 Products
@@ -70,11 +102,18 @@ class Product_Update(SQLModel):
 Buys
 """
 class Buy_Base(SQLModel):
-    date: str=Field(default_factory=lambda: datetime.now().isoformat())
-    cost: Optional[float] =Field(default=None)
+    date: str = Field(default_factory=lambda: datetime.now().date().isoformat())
+    cost: Optional[float] = Field(default=None)
     local: Optional[str] = Field(default=None, max_length=25)
-    business_type: Optional[str]= Field(default=None)
+    business_type: Optional[str] = Field(default=None)
     amount_products_type: int
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def validate_date(cls, value):
+        return normalize_date_value(value)
+
+
 class Buys_Table(Buy_Base, table=True):
     __tablename__="buys"
     id: Optional[int]=Field(default=None, primary_key=True)
@@ -105,10 +144,17 @@ class Buy_Update(SQLModel):
 Expense
 """
 class Expense_Base(SQLModel):
-    date: str=Field(default_factory=lambda: datetime.now().isoformat())
+    date: str = Field(default_factory=lambda: datetime.now().date().isoformat())
     amount: float
-    concept: str 
-    description: Optional[str]=Field(default=None)
+    concept: str
+    description: Optional[str] = Field(default=None)
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def validate_date(cls, value):
+        return normalize_date_value(value)
+
+
 class Expense_Table(Expense_Base, table=True):
     __tablename__="expense"
     id: Optional[int]=Field(default=None, primary_key=True)
@@ -137,10 +183,16 @@ Income
 """
 
 class Income_Base(SQLModel):
-    date: str=Field(default_factory=lambda: datetime.now().isoformat())
+    date: str = Field(default_factory=lambda: datetime.now().date().isoformat())
     amount: float
     concept: str
-    description: Optional[str]=Field(default=None)
+    description: Optional[str] = Field(default=None)
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def validate_date(cls, value):
+        return normalize_date_value(value)
+
 
 class Income_Table(Income_Base, table=True):
     __tablename__="income"
@@ -168,11 +220,18 @@ class Income_Update(SQLModel):
 Debt
 """
 class Debt_Base(SQLModel):
-    date: str=Field(default_factory=lambda: datetime.now().isoformat())
+    date: str = Field(default_factory=lambda: datetime.now().date().isoformat())
     amount: float
     borrower: str
     borrowed: str
-    interest: Optional[float]=Field(default=None)
+    interest: Optional[float] = Field(default=None)
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def validate_date(cls, value):
+        return normalize_date_value(value)
+
+
 class Debt_Table(Debt_Base, table=True):
     __tablename__="debt"
     id: Optional[int]=Field(default=None, primary_key=True)
@@ -208,7 +267,7 @@ class ItemInBuy(SQLModel):
 class BuyWithItemsRecord(SQLModel):
     """Complete buy transaction: buy + items + expense (ATOMIC)"""
     # Buy data
-    date: str = Field(default_factory=lambda: datetime.now().isoformat())
+    date: str = Field(default_factory=lambda: datetime.now().date().isoformat())
     local: Optional[str] = Field(default=None, max_length=25)
     business_type: Optional[str] = None
     # Items being bought
@@ -216,6 +275,11 @@ class BuyWithItemsRecord(SQLModel):
     # Expense details
     expense_concept: str
     expense_description: Optional[str] = None
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def validate_date(cls, value):
+        return normalize_date_value(value)
 
 class BuyWithItemsResponse(SQLModel):
     """Response showing all created entities from atomic buy"""

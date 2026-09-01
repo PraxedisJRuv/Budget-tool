@@ -86,8 +86,6 @@ def record_buy_with_items(buy_data: BuyWithItemsRecord, session=Depends(get_sess
 @app.post("/buy", response_model=Buy_Public)
 def record_buy(buy: Buy_Record, session=Depends(get_session)):
     """
-    ⚠️ DEPRECATED for typical use. Use POST /buy/complete instead.
-    
     This endpoint requires ID_expense to be already created and provided.
     Only use this for advanced workflows where you're managing transactions manually.
     

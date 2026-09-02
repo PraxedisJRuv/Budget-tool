@@ -49,9 +49,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-"""
-BUY MANAGEMENT
-"""
+
+#BUY MANAGEMENT
 
 def page_buys():
     st.title("💳 Buy Management")
@@ -167,7 +166,7 @@ def page_buys():
                 df["date"] = format_date_series(df["date"], include_time=True)
             df = df[["id", "date", "local", "business_type", "cost", "amount_products_type", "ID_expense"]]
             df.columns = ["ID", "Date", "Location", "Type", "Cost ($)", "Items Count", "Expense ID"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total records: {data.get('total', 0)}")
         else:
             st.info("No buys found")
@@ -218,9 +217,8 @@ def page_buys():
             if result is not None:
                 st.success("✅ Buy deleted successfully!")
 
-    """
-    EXPENSE MANAGEMENT
-    """
+
+#EXPENSE MANAGEMENT
     
 def page_expenses():
     st.title("📊 Expense Management")
@@ -280,7 +278,7 @@ def page_expenses():
                 df["date"] = format_date_series(df["date"])
             df = df[["id", "date", "amount", "concept", "description"]]
             df.columns = ["ID", "Date", "Amount ($)", "Concept", "Description"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total records: {data.get('total', 0)}")
         else:
             st.info("No expenses found")
@@ -332,9 +330,9 @@ def page_expenses():
             if result is not None:
                 st.success("✅ Expense deleted successfully!")
 
-"""
-INCOME MANAGEMENT
-"""
+
+#INCOME MANAGEMENT
+
 
 def page_income():
     st.title("💵 Income Management")
@@ -394,7 +392,7 @@ def page_income():
                 df["date"] = format_date_series(df["date"])
             df = df[["id", "date", "amount", "concept", "description"]]
             df.columns = ["ID", "Date", "Amount ($)", "Concept", "Description"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total records: {data.get('total', 0)}")
         else:
             st.info("No income found")
@@ -446,9 +444,7 @@ def page_income():
             if result is not None:
                 st.success("✅ Income deleted successfully!")
 
-"""
-DEBT MANAGEMENT
-"""
+#DEBT MANAGEMENT
 
 def page_debt():
     st.title("💳 Debt Management")
@@ -511,7 +507,7 @@ def page_debt():
                 df["date"] = format_date_series(df["date"])
             df = df[["id", "date", "amount", "borrower", "borrowed", "interest"]]
             df.columns = ["ID", "Date", "Amount ($)", "Borrower", "Borrowed", "Interest (%)"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total records: {data.get('total', 0)}")
         else:
             st.info("No debt records found")
@@ -566,9 +562,7 @@ def page_debt():
                 st.success("✅ Debt deleted successfully!")
 
 
-"""
-PRODUCTS & ITEMS MANAGEMENT
-"""
+#PRODUCTS & ITEMS MANAGEMENT
 
 
 def page_products():
@@ -591,7 +585,7 @@ def page_products():
         if data and data.get("items"):
             df = pd.DataFrame(data["items"])
             df.columns = ["ID", "Name"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total products: {data.get('total', 0)}")
         else:
             st.info("No products found")
@@ -612,7 +606,7 @@ def page_products():
             df = pd.DataFrame(data["items"])
             df = df[["id", "name", "cost", "Quantity", "ID_buy", "ID_expense"]]
             df.columns = ["ID", "Name", "Cost ($)", "Quantity", "Buy ID", "Expense ID"]
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df, width="stretch")
             st.caption(f"Total items: {data.get('total', 0)}")
         else:
             st.info("No items found")
@@ -699,7 +693,7 @@ def page_analytics():
                     color_discrete_sequence=px.colors.qualitative.Set3
                 )
                 fig.update_traces(textposition="inside", textinfo="percent+label")
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             with col2:
                 st.metric("Total Expenses", f"${expense_summary['amount'].sum():.2f}")
@@ -731,7 +725,7 @@ def page_analytics():
                     color_discrete_sequence=px.colors.qualitative.Pastel
                 )
                 fig.update_traces(textposition="inside", textinfo="percent+label")
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             with col2:
                 st.metric("Total Income", f"${income_summary['amount'].sum():.2f}")
@@ -789,7 +783,7 @@ def page_analytics():
                 labels={"value": "Amount ($)", "variable": "Type"}
             )
             fig.update_layout(hovermode="x unified")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             # Summary stats
             col1, col2, col3 = st.columns(3)
@@ -832,7 +826,7 @@ def page_analytics():
                             color_discrete_sequence=px.colors.qualitative.Plotly
                         )
                         fig.update_traces(textposition="inside", textinfo="percent+label")
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, width="stretch")
                     else:
                         st.info("No location data available")
                 else:
@@ -856,9 +850,9 @@ def page_analytics():
         else:
             st.info("No buy data for this period")
 
-"""
-DASHBOARD / HOME
-"""
+
+#DASHBOARD / HOME
+
 
 def page_dashboard():
     st.title("📈 Dashboard")
@@ -930,9 +924,9 @@ def page_dashboard():
         else:
             st.info("No expenses yet")
 
-"""
-MAIN APP
-"""
+
+#MAIN APP
+
 
 def main():
     # Sidebar navigation

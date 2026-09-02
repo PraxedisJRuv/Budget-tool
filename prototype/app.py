@@ -1,3 +1,11 @@
+"""
+All endpoints are functional, but might need some adjustments.
+post buy/completed was fixed with AI, and is pending a review
+
+The endpoints goal is to record, update and delete information (CRUD) about buys, expenses, income, etc. 
+Everything expended is meant to be tracked for personal finance.
+"""
+
 from fastapi import FastAPI, HTTPException, Response, Depends, Query
 from utils import create_db, get_session
 from models import *
@@ -88,7 +96,6 @@ def record_buy(buy: Buy_Record, session=Depends(get_session)):
     """
     This endpoint requires ID_expense to be already created and provided.
     Only use this for advanced workflows where you're managing transactions manually.
-    
     For normal usage, use POST /buy/complete which handles the entire transaction atomically.
     """
     db_buy=Buys_Table.model_validate(buy)
